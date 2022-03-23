@@ -1,0 +1,54 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
+ 
+namespace Demo0_0
+{
+    public class ClickUI_IPointerClickHandler_All : MonoBehaviour, IPointerClickHandler
+    {
+        private int _index;
+
+
+
+
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            ChangeColor();
+            ExecuteAll(eventData);
+        }
+
+        #region 辅助
+        public void ChangeColor()
+        {
+            if (_index == 0)
+            {
+                GetComponent<Image>().color = Color.blue;
+            }
+            else
+            {
+                GetComponent<Image>().color = Color.white;
+            }
+            _index = _index == 0 ? 1 : 0;
+        }
+
+
+
+        public void ExecuteAll(PointerEventData eventData)
+        {
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+            foreach (RaycastResult result in results)
+            {
+                if (result.gameObject != gameObject)
+                {
+                    ExecuteEvents.Execute(result.gameObject, eventData, ExecuteEvents.pointerClickHandler);
+                }
+            }
+        }
+        #endregion
+    }
+}
