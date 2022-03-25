@@ -8,12 +8,22 @@ using UnityEngine.UI;
 
 public class RotationDiagramItem : MonoBehaviour,IDragHandler,IEndDragHandler
 {
+
+
+    #region 字段
+    /// <summary>顺序</summary>
     public int PosId;
+    /// <summary>偏移量</summary>
     private Action<float> _moveAction;
     private Image _image;
     private float _offsetX;
+    /// <summary>拖动时动画持续时间</summary>
     private float _aniTime = 1;
+    private RectTransform _rect;
+    #endregion
 
+
+    #region 属性、属性方法
     private Image Image
     {
         get
@@ -24,9 +34,6 @@ public class RotationDiagramItem : MonoBehaviour,IDragHandler,IEndDragHandler
             return _image;
         }
     }
-
-    private RectTransform _rect;
-
     private RectTransform Rect
     {
         get
@@ -47,21 +54,8 @@ public class RotationDiagramItem : MonoBehaviour,IDragHandler,IEndDragHandler
     {
         Image.sprite = sprite;
     }
-
-    public void SetPosData(ItemPosData data)
-    {
-        Rect.DOAnchorPos(Vector2.right*data.X, _aniTime);
-        Rect.DOScale(Vector3.one*data.ScaleTimes, _aniTime);
-        
-        StartCoroutine(Wait(data));
-    }
-
-    private IEnumerator Wait(ItemPosData data)
-    {
-        yield return new WaitForSeconds(_aniTime*0.5f);
-        transform.SetSiblingIndex(data.Order);
-    }
-
+    #endregion
+    #region 重写
     public void OnDrag(PointerEventData eventData)
     {
         _offsetX += eventData.delta.x;
@@ -72,7 +66,7 @@ public class RotationDiagramItem : MonoBehaviour,IDragHandler,IEndDragHandler
         _moveAction(_offsetX);
         _offsetX = 0;
     }
-
+    #endregion
     public void AddMoveListener(Action<float> onMove)
     {
         _moveAction = onMove;
@@ -80,12 +74,32 @@ public class RotationDiagramItem : MonoBehaviour,IDragHandler,IEndDragHandler
 
     public void ChangeId(int symbol,int totalItemNum)
     {
-        int id = PosId;
-        id += symbol;
+        //比如一下
+        int id = PosId;//0；7
+        id += symbol;//0-1=-1；7+1=8
         if (id < 0)
         {
-            id += totalItemNum;
+            id += totalItemNum;//-1+8=7；8+8=16
         }
-        PosId = id%totalItemNum;
+        PosId = id%totalItemNum;//16&8=0
+    }
+
+    public void SetPosData(ItemPosData data)
+    {
+        Rect.DOAnchorPos(Vector2.right * data.X, _aniTime);
+        Rect.DOScale(Vector3.one * data.ScaleTimes, _aniTime);
+
+        StartCoroutine(Wait(data));
+    }
+
+    /// <summary>
+    /// 防止重叠时穿叉
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    private IEnumerator Wait(ItemPosData data)
+    {
+        yield return new WaitForSeconds(_aniTime * 0.5f);
+        transform.SetSiblingIndex(data.Order);
     }
 }

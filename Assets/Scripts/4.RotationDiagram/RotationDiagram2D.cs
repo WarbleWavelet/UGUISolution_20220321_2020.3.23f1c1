@@ -9,7 +9,9 @@ public class RotationDiagram2D : MonoBehaviour
     public Vector2 ItemSize;
     public Sprite[] ItemSprites;
     public float Offset;
+    /// <summary>min缩放，最后面的图</summary>
     public float ScaleTimesMin;
+    /// <summary>max缩放，最前面的图</summary>
     public float ScaleTimesMax;
 
     private List<RotationDiagramItem> _items;
@@ -50,12 +52,21 @@ public class RotationDiagram2D : MonoBehaviour
         Destroy(template);
     }
 
+
+    /// <summary>
+    /// 只需要正负判断左右
+    /// </summary>
+    /// <param name="offsetX"></param>
     private void Change(float offsetX)
     {
         int symbol = offsetX > 0 ? 1 : -1;
         Change(symbol);
     }
 
+    /// <summary>
+    /// 左右+=1
+    /// </summary>
+    /// <param name="symbol"></param>
     private void Change(int symbol)
     {
         foreach (RotationDiagramItem item in _items)
@@ -91,6 +102,7 @@ public class RotationDiagram2D : MonoBehaviour
 
             radio += radioOffset;
             _posData.Add(data);
+
         }
 
         itemDatas = itemDatas.OrderBy(u => _posData[u.PosId].ScaleTimes).ToList();
@@ -101,14 +113,24 @@ public class RotationDiagram2D : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 设置数据
+    /// </summary>
     private void SetItemData()
     {
         for (int i = 0; i < _posData.Count; i++)
+
         {
             _items[i].SetPosData(_posData[i]);
         }
     }
 
+    /// <summary>
+    /// 椭圆的x
+    /// </summary>
+    /// <param name="radio"></param>
+    /// <param name="length"></param>
+    /// <returns></returns>
     private float GetX(float radio, float length)
     {
         if (radio > 1 || radio < 0)
@@ -131,6 +153,13 @@ public class RotationDiagram2D : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 缩放
+    /// </summary>
+    /// <param name="radio"></param>
+    /// <param name="max"></param>
+    /// <param name="min"></param>
+    /// <returns></returns>
     public float GetScaleTimes(float radio, float max, float min)
     {
         if (radio > 1 || radio < 0)
@@ -139,7 +168,7 @@ public class RotationDiagram2D : MonoBehaviour
             return 0;
         }
 
-        float scaleOffset = (max - min) / 0.5f;
+        float scaleOffset = (max - min) / 0.5f;//单位代表的缩放比例
 
         if (radio < 0.5f)
         {
@@ -152,6 +181,7 @@ public class RotationDiagram2D : MonoBehaviour
     }
 }
 
+/// <summary>引用类型，区别struct值类型</summary>
 public class ItemPosData
 {
     public float X;
